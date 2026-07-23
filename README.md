@@ -1,79 +1,119 @@
-# AlertMate: Wearable IoT Fall Detection System
+# AlertMate: A Low-Cost Wearable IoT Fall Detection System
 
-AlertMate is a wearable IoT-based fall detection system designed to provide real-time emergency assistance for elderly individuals and people at risk of falls. The system detects falls using the Arduino Nano 33 BLE Sense Rev2's built-in 9-DOF IMU sensor, communicates with an Android application via Bluetooth Low Energy (BLE), and sends emergency alerts with the user's GPS location through Firebase Cloud Messaging (FCM).
+AlertMate is a wearable IoT-based fall detection system designed to provide real-time emergency assistance for elderly individuals, physically challenged users, and people involved in high-risk activities. The system performs on-device fall detection using the Arduino Nano 33 BLE Sense Rev2 and communicates with an Android application via Bluetooth Low Energy (BLE). When a fall is detected, the mobile application retrieves the user's GPS location and sends real-time emergency alerts to caregivers using Firebase Cloud Messaging (FCM).
 
 ## Features
 
-- Real-time fall detection using 9-DOF IMU sensor
-- EMA (Exponential Moving Average)-based adaptive thresholding
+- Wearable real-time fall detection
+- On-device inference using adaptive thresholding
+- Exponential Moving Average (EMA) based signal smoothing
 - Bluetooth Low Energy (BLE) communication
-- Android companion application
+- Android patient and caretaker applications
+- Firebase Realtime Database integration
 - Firebase Cloud Messaging (FCM) notifications
-- GPS location sharing
-- Multi-channel emergency alerts
-- Low-latency alert delivery (< 3 seconds)
+- GPS location tracking
+- User confirmation mechanism to reduce false alarms
+- Manual SOS emergency button
+
+---
 
 ## System Architecture
 
 ```
-Arduino Nano 33 BLE Sense Rev2
-          │
-      IMU Sensor
-          │
-   Fall Detection Algorithm
-          │
-      BLE Communication
-          │
-    Android Application
-          │
-    GPS Location Retrieval
-          │
- Firebase Cloud Messaging
-          │
- Emergency Contact Notification
+Wearable Device
+(Arduino Nano 33 BLE Sense Rev2)
+            │
+      IMU Sensor (BMI270)
+            │
+    Fall Detection Algorithm
+            │
+      Bluetooth Low Energy
+            │
+     Android Patient App
+            │
+ GPS + Firebase Realtime Database
+            │
+Firebase Cloud Messaging (FCM)
+            │
+ Android Caretaker App
 ```
 
-## Technologies Used
+---
+
+## Technology Stack
 
 ### Hardware
 
 - Arduino Nano 33 BLE Sense Rev2
-- 9-DOF IMU Sensor
-- Li-ion Battery
-- Bluetooth Low Energy (BLE)
+- BMI270 IMU
+- TP4056 Charging Module
+- 3.7V Li-Po Battery
 
 ### Software
 
 - Arduino IDE
 - Android Studio
-- Firebase Cloud Messaging (FCM)
+- Firebase Realtime Database
+- Firebase Cloud Messaging
+- Android (Java/Kotlin)
+
+### Communication
+
 - Bluetooth Low Energy (BLE)
-- Java/Kotlin
-- C++
+
+---
 
 ## Detection Algorithm
 
-The fall detection process consists of:
+The wearable continuously collects accelerometer and gyroscope readings from the BMI270 IMU.
 
-1. Read accelerometer and gyroscope data.
-2. Apply Exponential Moving Average (EMA) filtering.
-3. Detect free-fall condition.
-4. Detect impact using adaptive thresholds.
-5. Verify body orientation.
-6. Confirm fall event.
-7. Transmit alert to Android application via BLE.
-8. Retrieve current GPS location.
-9. Send emergency notification through Firebase.
+The detection pipeline consists of:
+
+1. Read IMU sensor data
+2. Compute resultant acceleration
+3. Apply Exponential Moving Average (EMA)
+4. Calculate adaptive thresholds
+5. Detect free-fall
+6. Detect impact
+7. Validate rapid transition
+8. Check orientation and post-fall inactivity
+9. Send BLE alert to Android application
+10. Retrieve GPS location
+11. Push emergency notification using Firebase
+
+---
+
+## Mobile Application
+
+### Patient Application
+
+- BLE device connection
+- Real-time fall status
+- GPS location retrieval
+- "I'm Safe" confirmation
+- Manual SOS button
+
+### Caretaker Application
+
+- Real-time notifications
+- Patient status monitoring
+- Live GPS location
+- Alert history
+
+---
 
 ## Performance
 
 | Metric | Value |
-|---------|-------|
-| Accuracy | **95.2%** |
-| Recall | **94.1%** |
-| F1-Score | **95.0%** |
-| Test Samples | **105** |
-| Alert Latency | **< 3 seconds** |
+|---------|------:|
+| Accuracy | 95.2% |
+| Recall | 94.1% |
+| F1 Score | 95.0% |
+| Alert Latency | < 3 seconds |
+
+The adaptive threshold algorithm successfully distinguishes fall events from normal daily activities while maintaining a low false alarm rate. :contentReference[oaicite:1]{index=1}
+
+---
 
 ## Repository Structure
 
@@ -82,7 +122,7 @@ AlertMate/
 │
 ├── Arduino/
 │   ├── AlertMate.ino
-│   └── ...
+│   └── README.md
 │
 ├── Android-App/
 │   ├── app/
@@ -92,81 +132,88 @@ AlertMate/
 │   └── ...
 │
 ├── Images/
-│   ├── Architecture.png
-│   ├── Hardware.jpg
-│   ├── App1.png
-│   └── App2.png
+│   ├── architecture.png
+│   ├── patient_dashboard.png
+│   ├── caretaker_dashboard.png
+│   ├── location_screen.png
+│   └── hardware.jpg
 │
 ├── Docs/
-│   ├── Project_Report.pdf
-│   ├── Presentation.pdf
-│   └── User_Manual.pdf
+│   ├── AlertMate_Paper.pdf
+│   └── Presentation.pdf
 │
-├── LICENSE
-└── README.md
+├── README.md
+└── LICENSE
 ```
+
+---
 
 ## Installation
 
-### Arduino
+### Arduino Firmware
 
 1. Install Arduino IDE.
 2. Install the Arduino Nano 33 BLE board package.
 3. Install the required libraries.
-4. Open the Arduino project.
-5. Upload the code to the Arduino Nano 33 BLE Sense Rev2.
+4. Upload the firmware to the Arduino Nano 33 BLE Sense Rev2.
 
-### Android
+### Android Application
 
 1. Open the Android project in Android Studio.
-2. Sync Gradle dependencies.
-3. Add your Firebase configuration (`google-services.json`).
-4. Build and install the application on an Android device.
-5. Pair the application with the Arduino device using BLE.
+2. Add your `google-services.json` file.
+3. Sync Gradle.
+4. Build and install the application.
+5. Pair the wearable device using BLE.
 
-## Usage
+---
 
-1. Wear the AlertMate device.
-2. Connect it to the Android application.
-3. The system continuously monitors motion using IMU data.
-4. Upon detecting a fall:
-   - The Android application receives the BLE alert.
-   - GPS location is obtained.
-   - Firebase Cloud Messaging sends emergency notifications to registered contacts.
+## How It Works
 
-## Results
+1. The wearable continuously monitors motion using the BMI270 IMU.
+2. Sensor data is filtered using EMA.
+3. Adaptive thresholds identify free-fall and impact events.
+4. When a fall is confirmed, the wearable sends an alert via BLE.
+5. The Android app retrieves the user's GPS location.
+6. Firebase stores the event and triggers FCM notifications.
+7. The caretaker receives an instant alert with the patient's location.
+8. The patient can confirm they are safe or manually trigger an SOS alert.
 
-- Successfully detects falls in real time.
-- Provides emergency notifications within **3 seconds**.
-- Achieved **95.2% accuracy**, **94.1% recall**, and **95.0% F1-score** on 105 test samples.
+---
 
 ## Future Improvements
 
-- Cloud-based health monitoring dashboard
+- TinyML-based fall detection
 - Smartwatch integration
-- Voice assistant integration
-- AI-based personalized fall detection
-- Indoor location tracking
-- Health sensor integration (Heart Rate, SpO₂)
+- Health monitoring sensors (Heart Rate, SpO₂)
+- Indoor positioning support
+- Cloud analytics dashboard
+- Personalized adaptive threshold learning
+
+---
 
 ## Publication
 
-This work was accepted as a **Category I Demo** at:
+**AlertMate: A Low-Cost, Wearable IoT Locket With On-Device Inference For Reliable Fall Detection In Vulnerable Users With Multi-Channel Alerts**
 
-**IEEE CONECCT 2026 (12th IEEE International Conference on Electronics, Computing and Communication Technologies)**
+Accepted as a **Category I Demo** at:
+
+**IEEE CONECCT 2026 – 12th IEEE International Conference on Electronics, Computing and Communication Technologies.** :contentReference[oaicite:2]{index=2}
+
+---
 
 ## Authors
 
-**Revanth N**
+- Revanth N
+- Nitin Kumar Mishra
+- Aditya Kharde
+- Rakesh Kumar Nayak
+- Sejal Rathod
+- Dr. Kaustubh Dhondge
 
-M.Tech in Data Science & Artificial Intelligence
+Indian Institute of Information Technology Surat
 
-Indian Institute of Information Technology, Surat
+---
 
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-If you use this project in your research or academic work, please consider giving appropriate credit.
